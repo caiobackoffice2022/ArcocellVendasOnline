@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Claro Vendas — Gestão</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- TOASTS / TOOLTIP -->
+  <div id="toasts" class="toasts"></div>
+  <div id="chartTip" class="chart-tip hide"></div>
+
+  <!-- LOGIN -->
+  <section id="loginScreen" class="login-hero">
+    <div class="login-card">
+      <img id="logoLogin" src="claro-logo.png" alt="Claro" onerror="this.style.display='none'">
+      <h1>Claro</h1>
+      <h2>GESTÃO DE VENDAS<br>ARCOCELL!</h2>
+      <form id="loginForm" autocomplete="off">
+        <label for="loginUser">Usuário</label>
+        <input id="loginUser" type="text" placeholder="seu usuário" required />
+
+        <label for="loginPass">Senha</label>
+        <input id="loginPass" type="password" placeholder="•••••" required />
+
+        <button class="btn primary" type="submit">Entrar</button>
+      </form>
+      <p id="loginHint" class="muted" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- APP (TOP BAR) -->
+  <header id="appTopbar" class="topbar hide" aria-hidden="true">
+    <div class="brand">
+      <!-- Logo Claro SVG sem watermark -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="logo-claro" aria-label="Claro">
+        <circle cx="100" cy="100" r="100" fill="#E30613"/>
+        <text x="50%" y="56%" text-anchor="middle" fill="#fff" font-size="72" font-family="Arial, Helvetica, sans-serif" font-weight="bold">Claro</text>
+      </svg>
+    </div>
+    <nav class="menu">
+      <a href="#" data-view="lancar" class="active">Lançar</a>
+      <a href="#" data-view="registros">Registros</a>
+      <a href="#" data-view="relatorios">Relatórios</a>
+      <a href="#" data-view="meta">Meta</a>
+      <a href="#" data-view="admin" data-requires="adminLike">Administração</a>
+      <a href="#" data-view="auditoria" data-requires="adminLike">Auditoria</a>
+      <a href="#" data-view="backup" data-requires="adminLike">Backup</a>
+      <a href="#" data-view="conta">Minha conta</a>
+    </nav>
+    <div class="userbox">
+      <span id="userInfo" class="badge">—</span>
+      <button id="btnLogout" class="btn danger">Sair</button>
+    </div>
+  </header>
+
+  <!-- APP (LAYOUT) -->
+  <main id="appLayout" class="layout hide" aria-hidden="true">
+
+    <!-- ============ LANÇAR ============ -->
+    <section id="lancar" class="view">
+      <h2>Lançar</h2>
+      <form id="vendaForm" class="grid">
+        <div>
+          <label>Data</label>
+          <input id="vData" type="date" />
+        </div>
+        <div>
+          <label>Loja</label>
+          <select id="vLoja"></select>
+        </div>
+        <div>
+          <label>Vendedor</label>
+          <select id="vendedor"></select>
+        </div>
+        <div>
+          <label>Categoria</label>
+          <select id="vCat">
+            <option>Móvel</option>
+            <option>Residencial</option>
+          </select>
+        </div>
+        <div>
+          <label>Plano</label>
+          <select id="vPlano"></select>
+        </div>
+        <div>
+          <label>GED</label>
+          <select id="vGed"></select>
+        </div>
+        <div class="span2">
+          <label>Contrato</label>
+          <input id="vContrato" type="text" />
+        </div>
+
+        <!-- APARELHO -->
+        <fieldset id="wrapAparelho" class="span2 hide">
+          <legend>Dados do Aparelho</legend>
+          <div>
+            <label>Modelo</label>
+            <input id="vModelo" type="text" />
+          </div>
+          <div>
+            <label>Valor</label>
+            <input id="vValor" type="number" min="0" step="0.01" />
+          </div>
+          <div class="span2">
+            <label>Nº do IMEI</label>
+            <input id="vImei" type="text" />
+          </div>
+        </fieldset>
+
+        <div class="span2">
+          <button class="btn primary" type="submit">Salvar</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============ REGISTROS ============ -->
+    <section id="registros" class="view hide">
+      <h2>Registros</h2>
+      <div class="filters">
+        <label>Loja
+          <select id="regLoja"></select>
+        </label>
+        <label>GED
+          <div id="regGed" class="checks"></div>
+        </label>
+        <label>Mês
+          <input id="regMes" type="month">
+        </label>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th><th>Loja</th><th>Vendedor</th><th>Categoria</th>
+              <th>Plano</th><th>GED</th><th>Contrato</th><th>Modelo</th>
+              <th>Valor</th><th>IMEI</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyRegistros"></tbody>
+        </table>
+      </div>
+      <div id="regPag" class="pager"></div>
+
+      <div class="actions">
+        <button id="btnExportCSV" class="btn ghost">Exportar CSV</button>
+      </div>
+    </section>
+
+    <!-- ============ RELATÓRIOS ============ -->
+    <section id="relatorios" class="view hide">
+      <h2>Relatórios</h2>
+      <div class="filters grid">
+        <label>Mês <input id="rMes" type="month"></label>
+        <div>
+          <strong>Lojas</strong>
+          <div id="rLojas" class="checks"></div>
+        </div>
+        <div>
+          <strong>Vendedores</strong>
+          <div id="rVendedores" class="checks"></div>
+        </div>
+        <div>
+          <strong>Planos</strong>
+          <div id="rPlanos" class="checks"></div>
+        </div>
+        <div>
+          <strong>GED</strong>
+          <div id="rGeds" class="checks"></div>
+        </div>
+        <div class="align-end">
+          <button id="btnPrint" class="btn ghost">Imprimir PDF</button>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="card kpi"><div class="kpi_label">Total</div><div id="kpiTotal" class="kpi_value">0</div></div>
+        <div class="card kpi"><div class="kpi_label">Móvel</div><div id="kpiMovel" class="kpi_value">0</div></div>
+        <div class="card kpi"><div class="kpi_label">Residencial</div><div id="kpiResid" class="kpi_value">0</div></div>
+        <div class="card kpi"><div class="kpi_label">Receita Aparelhos</div><div id="kpiRecVal" class="kpi_value">R$ 0,00</div></div>
+      </div>
+
+      <div class="grid charts">
+        <canvas id="chDonut" height="260"></canvas>
+        <canvas id="chLojas" height="260"></canvas>
+        <canvas id="chPlano" height="260"></canvas>
+        <canvas id="chVendedor" height="260"></canvas>
+      </div>
+
+      <div id="kpiPlanos" class="kpis wrap"></div>
+    </section>
+
+    <!-- ============ METAS ============ -->
+    <section id="meta" class="view hide">
+      <h2>Metas</h2>
+
+      <h3 class="header-row">Por plano (Loja)</h3>
+      <div class="filters">
+        <label>Mês <input id="metaMes" type="month"></label>
+        <div id="clMetaLojas" class="checks"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Plano</th><th>Meta</th><th>Realizado</th><th>Ating.</th><th>Tend.</th></tr></thead>
+          <tbody id="tbodyMeta"></tbody>
+        </table>
+      </div>
+      <div class="grid charts">
+        <canvas id="chMetaLojaBar" height="220"></canvas>
+        <canvas id="chMetaLojaMxR" height="220"></canvas>
+        <canvas id="chMetaLojaDonut" height="220"></canvas>
+      </div>
+      <div class="actions">
+        <button id="btnMetaSalvar" class="btn ghost">Salvar metas (Loja)</button>
+      </div>
+
+      <h3 class="header-row">Por vendedor</h3>
+      <div class="filters">
+        <label>Mês <input id="metaVMes" type="month"></label>
+        <label>Loja <select id="metaVLoja"></select></label>
+        <label>Vendedor <select id="metaVVendedor"></select></label>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Plano</th><th>Meta</th><th>Realizado</th><th>Ating.</th><th>Tend.</th></tr></thead>
+          <tbody id="tbodyMetaV"></tbody>
+        </table>
+      </div>
+      <div class="grid charts">
+        <canvas id="chMetaVendBar" height="220"></canvas>
+        <canvas id="chMetaVendMxR" height="220"></canvas>
+        <canvas id="chMetaVendDonut" height="220"></canvas>
+      </div>
+      <div class="actions">
+        <button id="btnMetaVSalvar" class="btn ghost">Salvar metas (Vendedor)</button>
+      </div>
+
+      <h3 class="header-row">Heatmap — Atingimento (Vendedor × Plano)</h3>
+      <div class="filters">
+        <label>Mês <input id="metaHMes" type="month"></label>
+        <label>Loja <select id="metaHLoja"></select></label>
+      </div>
+      <div class="card">
+        <canvas id="chHeatmap" height="360"></canvas>
+      </div>
+    </section>
+
+    <!-- ============ ADMIN ============ -->
+    <section id="admin" class="view hide">
+      <h2>Administração</h2>
+
+      <div class="grid two">
+        <div class="card">
+          <h3>Usuários</h3>
+          <form id="userForm" class="grid">
+            <input id="uUsername" type="text" placeholder="usuário" required>
+            <input id="uPass" type="password" placeholder="senha" required>
+            <select id="uRole"></select>
+            <select id="uLoja"></select>
+            <button class="btn primary" type="submit">Criar</button>
+          </form>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Usuário</th><th>Loja</th><th>Papel</th><th>Status</th><th>Ações</th></tr></thead>
+              <tbody id="tbodyUsers"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Lojas & Papéis</h3>
+          <div class="grid">
+            <div>
+              <label>Nova loja</label>
+              <input id="novaLoja" type="text">
+              <button id="btnAddLoja" class="btn ghost">+ Adicionar Loja</button>
+            </div>
+            <div>
+              <label>Novo papel</label>
+              <input id="novoPapel" type="text">
+              <button id="btnAddRole" class="btn ghost">+ Adicionar Papel</button>
+            </div>
+          </div>
+          <div class="grid two">
+            <div class="table-wrap">
+              <table><thead><tr><th>Lojas</th><th>Ações</th></tr></thead><tbody id="tbodyLojas"></tbody></table>
+            </div>
+            <div class="table-wrap">
+              <table><thead><tr><th>Papéis</th><th>Ações</th></tr></thead><tbody id="tbodyRoles"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card span2">
+          <h3>Planos</h3>
+          <form id="planForm" class="row">
+            <select id="planCat">
+              <option value="Móvel">Móvel</option>
+              <option value="Residencial">Residencial</option>
+            </select>
+            <input id="planNome" type="text" placeholder="Nome do plano" required>
+            <button class="btn ghost" type="submit">Adicionar</button>
+          </form>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Categoria</th><th>Plano</th><th>Ações</th></tr></thead>
+              <tbody id="tbodyPlan"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ AUDITORIA ============ -->
+    <section id="auditoria" class="view hide">
+      <h2>Auditoria</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Data/Hora</th><th>Usuário</th><th>Evento</th><th>Detalhes</th></tr></thead>
+          <tbody id="tbodyAudit"></tbody>
+        </table>
+      </div>
+
+      <h3 class="header-row">Usuários Inativos</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Usuário</th><th>Loja</th><th>Papel</th><th>Último acesso</th><th>Ação</th></tr></thead>
+          <tbody id="tbodyInactive"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ BACKUP ============ -->
+    <section id="backup" class="view hide">
+      <h2>Backup</h2>
+      <div class="grid">
+        <button id="btnExport" class="btn ghost">Exportar JSON</button>
+        <label class="btn ghost file">
+          Importar JSON
+          <input id="importFile" type="file" accept="application/json">
+        </label>
+        <label class="btn ghost file">
+          Mesclar JSON(s)
+          <input id="mergeFiles" multiple type="file" accept="application/json">
+        </label>
+        <button id="btnMerge" class="btn ghost">Mesclar</button>
+        <button id="btnExportBI" class="btn ghost">Exportar CSVs (BI)</button>
+      </div>
+    </section>
+
+    <!-- ============ MINHA CONTA ============ -->
+    <section id="conta" class="view hide">
+      <h2>Minha conta</h2>
+      <form id="accountForm" class="grid">
+        <div><label>Usuário</label><input id="accUser" type="text" readonly></div>
+        <div><label>Loja</label><input id="accLoja" type="text" readonly></div>
+        <div><label>Papel</label><input id="accRole" type="text" readonly></div>
+        <div class="span2"><hr></div>
+        <div><label>Senha atual</label><input id="accCur" type="password" required></div>
+        <div><label>Nova senha</label><input id="accNew" type="password" required></div>
+        <div><label>Confirmar nova</label><input id="accNew2" type="password" required></div>
+        <div class="span2"><button class="btn primary" type="submit">Atualizar senha</button></div>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- MODAL EDITAR REGISTRO (começa escondido de verdade) -->
+  <div id="modal" class="modal hide" aria-hidden="true" hidden>
+    <div class="modal-box">
+      <h3>Editar venda</h3>
+      <form id="editForm" class="grid">
+        <div><label>Data</label><input id="eData" type="date"></div>
+        <div><label>Loja</label><input id="eLoja" type="text"></div>
+        <div><label>Vendedor</label><input id="eVendedor" type="text"></div>
+        <div><label>Categoria</label><input id="eCategoria" type="text" placeholder="Móvel/Residencial"></div>
+        <div><label>Plano</label><input id="ePlano" type="text"></div>
+        <div><label>GED</label><input id="eGED" type="text" placeholder="IC|CO..."></div>
+        <div><label>Contrato</label><input id="eContrato" type="text"></div>
+        <div><label>Modelo</label><input id="eModelo" type="text"></div>
+        <div><label>Valor</label><input id="eValor" type="number" step="0.01" min="0"></div>
+        <div class="span2"><label>IMEI</label><input id="eImei" type="text"></div>
+        <div class="span2 row end">
+          <button id="btnCancel" type="button" class="btn ghost">Cancelar</button>
+          <button class="btn primary" type="submit">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="app.js" defer></script>
+</body>
+</html>
